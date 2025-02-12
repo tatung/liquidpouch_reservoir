@@ -40,8 +40,8 @@ const byte MLX90640_address =
 paramsMLX90640 mlx90640;
 
 // low range of the sensor (this will be blue on the screen)
-float mintemp   = 24;   // For color mapping
-float min_v     = 24;   // Value of current min temp
+float mintemp   = 10;   // For color mapping
+float min_v     = 10;   // Value of current min temp
 float min_cam_v = -40;  // Spec in datasheet
 
 // high range of the sensor (this will be red on the screen)
@@ -85,6 +85,17 @@ const uint16_t camColors[] = {
 float get_point(float *p, uint8_t rows, uint8_t cols, int8_t x, int8_t y);
 
 long loopTime, startTime, endTime, fps;
+long startMeasureTime;
+
+// Define timer
+hw_timer_t * timer = NULL;
+volatile bool timerFlag = false;
+
+// Timer Interrupt Service Routine (ISR)
+void IRAM_ATTR onTimer() {
+    timerFlag = !timerFlag;  // Set flag when timer fires
+    digitalWrite(19, timerFlag ? HIGH : LOW);
+}
 
 // cover 1 --> 5, 32 * 24 --> 160 * 120
 void cover5() {
@@ -126,7 +137,7 @@ void drawpixels(float *p, uint8_t rows, uint8_t cols) {
     for (int y = 0; y < rows; y++) {
         for (int x = 0; x < cols; x++) {
             float val = get_point(p, rows, cols, x, y);
-            Serial.printf("%2f ", val);
+            // Serial.printf("%2f ", val);
 
             if (val >= maxtemp) {
                 colorTemp = maxtemp;
@@ -141,7 +152,7 @@ void drawpixels(float *p, uint8_t rows, uint8_t cols) {
             // draw the pixels!
             img.drawPixel(x, y, camColors[colorIndex]);
         }
-        Serial.printf("\r\n");
+        // Serial.printf("\r\n");
     }
 
     img.drawCircle(COLS_4 / 2, ROWS_4 / 2, 5,
@@ -158,15 +169,54 @@ void drawpixels(float *p, uint8_t rows, uint8_t cols) {
     msg.fillScreen(TFT_BLACK);
     msg.setTextColor(TFT_YELLOW);
     msg.setCursor(11, 3);
-    msg.print("min tmp");
+    msg.printf("min tmp (%2.fC)", mintemp);
     msg.setCursor(13, 15);
     msg.printf("%.2fC", min_v);
     msg.setCursor(11, 27);
-    msg.print("max tmp");
+    msg.printf("max tmp (%2.fC)", maxtemp);
     msg.setCursor(13, 39);
     msg.printf("%.2fC", max_v);
 
     msg.pushSprite(COLS_4, 10);
+}
+
+typedef struct{
+  float *p;
+  uint8_t rows;
+  uint8_t cols;
+} TempParams;
+
+void tempLog(void *pvParams){
+    TempParams *params = (TempParams*) pvParams;
+    float *p = params->p;
+    int rows = params->rows;
+    int cols = params->cols;
+    while(1){
+      int colorTemp;
+      // Serial.printf("%f, %f, %.2fC\r\n", mintemp, maxtemp, get_point(p, rows, cols, cols / 2, rows / 2));
+
+      for (int y = 0; y < rows; y++) {
+          Serial.printf("%ld: ", millis() - startMeasureTime);
+          for (int x = 0; x < cols; x++) {
+              float val = get_point(p, rows, cols, x, y);
+              Serial.printf("%2f ", val);
+
+              if (val >= maxtemp) {
+                  colorTemp = maxtemp;
+              } else if (val <= mintemp) {
+                  colorTemp = mintemp;
+              } else {
+                  colorTemp = val;
+              }
+
+              uint8_t colorIndex = map(colorTemp, mintemp, maxtemp, 0, 255);
+              colorIndex         = constrain(colorIndex, 0, 255);  // 0 ~ 255
+              // draw the pixels!
+              img.drawPixel(x, y, camColors[colorIndex]);
+          }
+          Serial.printf("\r\n");
+      }
+    }
 }
 
 void setup() {
@@ -207,16 +257,54 @@ void setup() {
     for (int icol = 0; icol <= 127; icol++) {
         M5.Lcd.drawRect(icol * 2, 127, 2, 12, camColors[icol * 2]);
     }
+    // msg.fillScreen(TFT_BLACK);
+    // msg.setTextColor(TFT_YELLOW);
+    // msg.setCursor(11, 3);
+    // msg.print("min tmp");
+    // msg.setCursor(13, 15);
+    // msg.printf("%.2fC", min_v);
+    // msg.setCursor(11, 27);
+    // msg.print("max tmp");
+    // msg.setCursor(13, 39);
+    // msg.printf("%.2fC", max_v);
+
+    static TempParams params = {pixels_4, ROWS_4, COLS_4};
+    xTaskCreatePinnedToCore(
+      tempLog,
+      "tempLog",
+      4096,
+      &params,
+      1,
+      NULL,
+      0
+    );
+    startMeasureTime = millis();
+
+    // Initialize hardware timer (0) with 1ms prescaler
+    timer = timerBegin(0, 80, true); // Timer 0, prescaler 80 (1MHz), count up
+    timerAttachInterrupt(timer, &onTimer, true);
+    timerAlarmWrite(timer, 1000000, true); // 1 second interval (1M µs)
+    timerAlarmEnable(timer);  // Start the timer
+    pinMode(19, OUTPUT);
 }
 
 void loop() {
     loopTime  = millis();
     startTime = loopTime;
 
+    // if(timerFlag){
+    //   timerFlag = false;
+    //   digitalWrite(19, HIGH);
+    // }
+
     M5.update();
     // if (M5.Axp.GetBtnPress() == 0x02) {
     //     esp_restart();
     // }
+
+    if (M5.BtnC.pressedFor(2000)) {
+        esp_restart();
+    }
 
     // Reset settings
     if (M5.BtnA.pressedFor(1000)) {
@@ -225,12 +313,16 @@ void loop() {
     }
 
     // Set Min Value - SortPress //
+    // if (M5.BtnA.wasPressed()) {
+    //     if (mintemp <= 0) {
+    //         mintemp = maxtemp - 1;
+    //     } else {
+    //         mintemp--;
+    //     }
+    // }
+
     if (M5.BtnA.wasPressed()) {
-        if (mintemp <= 0) {
-            mintemp = maxtemp - 1;
-        } else {
-            mintemp--;
-        }
+        startMeasureTime = millis();
     }
 
     if (M5.BtnB.wasPressed()) {
@@ -289,8 +381,6 @@ void loop() {
 
     // show tmp image
     drawpixels(pixels_4, ROWS_4, COLS_4);
-    
-    // log temp
 
 
     loopTime = millis();
