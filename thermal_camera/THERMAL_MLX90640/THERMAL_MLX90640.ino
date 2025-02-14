@@ -92,8 +92,8 @@ hw_timer_t * timer = NULL;
 volatile bool timerFlag = true;
 
 // pouch time
-long onTime = 60000000;
-long offTime = 15000000;
+long onTime = 2000000;
+long offTime = 1000000;
 
 // Timer Interrupt Service Routine (ISR)
 void IRAM_ATTR onTimer() {
@@ -139,12 +139,10 @@ void cover5() {
 
 void drawpixels(float *p, uint8_t rows, uint8_t cols) {
     int colorTemp;
-    // Serial.printf("%f, %f, %.2fC\r\n", mintemp, maxtemp, get_point(p, rows, cols, cols / 2, rows / 2));
 
     for (int y = 0; y < rows; y++) {
         for (int x = 0; x < cols; x++) {
             float val = get_point(p, rows, cols, x, y);
-            // Serial.printf("%2f ", val);
 
             if (val >= maxtemp) {
                 colorTemp = maxtemp;
@@ -159,7 +157,6 @@ void drawpixels(float *p, uint8_t rows, uint8_t cols) {
             // draw the pixels!
             img.drawPixel(x, y, camColors[colorIndex]);
         }
-        // Serial.printf("\r\n");
     }
 
     img.drawCircle(COLS_4 / 2, ROWS_4 / 2, 5,
@@ -199,27 +196,11 @@ void tempLog(void *pvParams){
     int rows = params->rows;
     int cols = params->cols;
     while(1){
-      int colorTemp;
-      // Serial.printf("%f, %f, %.2fC\r\n", mintemp, maxtemp, get_point(p, rows, cols, cols / 2, rows / 2));
-
       for (int y = 0; y < rows; y++) {
           Serial.printf("%ld: ", millis() - startMeasureTime);
           for (int x = 0; x < cols; x++) {
               float val = get_point(p, rows, cols, x, y);
               Serial.printf("%2f ", val);
-
-              if (val >= maxtemp) {
-                  colorTemp = maxtemp;
-              } else if (val <= mintemp) {
-                  colorTemp = mintemp;
-              } else {
-                  colorTemp = val;
-              }
-
-              uint8_t colorIndex = map(colorTemp, mintemp, maxtemp, 0, 255);
-              colorIndex         = constrain(colorIndex, 0, 255);  // 0 ~ 255
-              // draw the pixels!
-              img.drawPixel(x, y, camColors[colorIndex]);
           }
           Serial.printf("\r\n");
       }
