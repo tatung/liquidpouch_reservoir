@@ -89,19 +89,148 @@ long startMeasureTime;
 
 // Define timer
 hw_timer_t * timer = NULL;
-volatile bool timerFlag = true;
+volatile bool timerFlag = false;
 
 // pouch time
-long onTime = 2000000;
-long offTime = 1000000;
+long onTime = 0;
+long offTime = 0;
+
+int NO_OF_THERMAL_CYCLES = 10;
+int NO_OF_EXP = 60;
+int _thermal_cycle_cnt = -1;
+int _exp_cnt = 0;
+
+// 2D array of time intervals for heating and cooling cycles
+// long thermal_intervals[10][2] = {
+//     {1000000, 15000000},
+//     {2000000, 15000000},
+//     {3000000, 15000000},
+//     {4000000, 15000000},
+//     {5000000, 15000000},
+//     {6000000, 15000000},
+//     {7000000, 15000000},
+//     {8000000, 15000000},
+//     {9000000, 15000000},
+//     {10000000, 15000000},
+// };
+
+long thermal_intervals[60][2] = {
+    {50000000, 15000000},
+    {15000000, 15000000},
+    {11000000, 15000000},
+    {40000000, 15000000},
+    {41000000, 15000000},
+    {30000000, 15000000},
+    {13000000, 15000000},
+    {60000000, 15000000},
+    {32000000, 15000000},
+    {7000000, 15000000},
+    {47000000, 15000000},
+    {1000000, 15000000},
+    {43000000, 15000000},
+    {35000000, 15000000},
+    {55000000, 15000000},
+    {9000000, 15000000},
+    {17000000, 15000000},
+    {33000000, 15000000},
+    {34000000, 15000000},
+    {4000000, 15000000},
+    {38000000, 15000000},
+    {10000000, 15000000},
+    {12000000, 15000000},
+    {3000000, 15000000},
+    {31000000, 15000000},
+    {51000000, 15000000},
+    {59000000, 15000000},
+    {49000000, 15000000},
+    {36000000, 15000000},
+    {46000000, 15000000},
+    {45000000, 15000000},
+    {25000000, 15000000},
+    {21000000, 15000000},
+    {8000000, 15000000},
+    {16000000, 15000000},
+    {19000000, 15000000},
+    {48000000, 15000000},
+    {39000000, 15000000},
+    {58000000, 15000000},
+    {52000000, 15000000},
+    {20000000, 15000000},
+    {6000000, 15000000},
+    {14000000, 15000000},
+    {29000000, 15000000},
+    {42000000, 15000000},
+    {18000000, 15000000},
+    {26000000, 15000000},
+    {2000000, 15000000},
+    {37000000, 15000000},
+    {23000000, 15000000},
+    {22000000, 15000000},
+    {44000000, 15000000},
+    {53000000, 15000000},
+    {54000000, 15000000},
+    {56000000, 15000000},
+    {57000000, 15000000},
+    {28000000, 15000000},
+    {27000000, 15000000},
+    {24000000, 15000000},
+    {5000000, 15000000}
+};
+
+void switchHeater(bool isOn){
+    if(isOn){
+        digitalWrite(33, HIGH);
+        digitalWrite(19, HIGH);
+        timerFlag = true;
+    }else{
+        digitalWrite(33, LOW);
+        digitalWrite(19, LOW);
+        timerFlag = false;
+    }
+}
 
 // Timer Interrupt Service Routine (ISR)
 void IRAM_ATTR onTimer() {
+    if(_exp_cnt >= NO_OF_EXP){
+        timerAlarmDisable(timer);  // Stop the timer
+        switchHeater(false);
+        onTime = 0;
+        offTime = 0;
+        return;
+    }
+    if(!timerFlag){
+        if(_thermal_cycle_cnt < NO_OF_THERMAL_CYCLES-1){
+            _thermal_cycle_cnt++;
+        }else{
+            _thermal_cycle_cnt = 0;
+            _exp_cnt++;
+        }
+        if(_exp_cnt >= NO_OF_EXP){
+            timerAlarmDisable(timer);  // Stop the timer
+            switchHeater(false);
+            onTime = 0;
+            offTime = 0;
+            return;
+        }
+        onTime = thermal_intervals[_exp_cnt][0];
+        offTime = thermal_intervals[_exp_cnt][1];
+    }
     timerFlag = !timerFlag;  // Set flag when timer fires
-    digitalWrite(19, timerFlag ? HIGH : LOW);
-    digitalWrite(33, timerFlag ? HIGH : LOW);
-    timerAlarmWrite(timer, timerFlag ? onTime : offTime, true); // 1 second interval (1M µs)
+    if(timerFlag){
+        switchHeater(true);
+        timerAlarmWrite(timer, onTime, true); // 1 second interval (1M µs)
+    }else{
+        switchHeater(false);
+        timerAlarmWrite(timer, offTime, true); // 1 second interval (1M µs)
+    }
     timerAlarmEnable(timer);  // Start the timer
+
+    // Serial.printf("timer fired, timerFlag: %d\n", timerFlag);
+    // timerFlag = !timerFlag;  // Set flag when timer fires
+    // digitalWrite(19, timerFlag ? HIGH : LOW);
+    // digitalWrite(33, timerFlag ? HIGH : LOW);
+    // timerAlarmWrite(timer, timerFlag ? onTime : offTime, true); // 1 second interval (1M µs)
+    // timerAlarmEnable(timer);  // Start the timer
 }
 
 // cover 1 --> 5, 32 * 24 --> 160 * 120
@@ -197,7 +326,7 @@ void tempLog(void *pvParams){
     int cols = params->cols;
     while(1){
       for (int y = 0; y < rows; y++) {
-          Serial.printf("%ld: ", millis() - startMeasureTime);
+          Serial.printf("%d, %d, onTime = %ld, offTime = %ld, %ld: ", _exp_cnt, _thermal_cycle_cnt, onTime, offTime, millis() - startMeasureTime);
           for (int x = 0; x < cols; x++) {
               float val = get_point(p, rows, cols, x, y);
               Serial.printf("%2f ", val);
@@ -215,6 +344,8 @@ void setup() {
     M5.Lcd.setRotation(1);
 
     Serial.begin(115200);
+    pinMode(19, OUTPUT);
+    pinMode(33, OUTPUT);
     // Serial.println("Hello from Serial");
 
     // use show tmp bitmap
@@ -271,12 +402,8 @@ void setup() {
     // Initialize hardware timer (0) with 1ms prescaler
     timer = timerBegin(0, 80, true); // Timer 0, prescaler 80 (1MHz), count up
     timerAttachInterrupt(timer, &onTimer, true);
-    timerAlarmWrite(timer, timerFlag ? onTime : offTime, true); // 1 second interval (1M µs)
+    timerAlarmWrite(timer, 10000000, true); // 5 second interval (1M µs)
     timerAlarmEnable(timer);  // Start the timer
-    pinMode(19, OUTPUT);
-    pinMode(33, OUTPUT);
-    digitalWrite(19, timerFlag ? HIGH : LOW);
-    digitalWrite(33, timerFlag ? HIGH : LOW);
 }
 
 void loop() {
