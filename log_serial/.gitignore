@@ -47,4 +47,4 @@ logs/
 .DS_Store
 Thumbs.db
 
-log_serial/serial_log.txt
+serial_log.txt
