@@ -89,12 +89,19 @@ long startMeasureTime;
 
 // Define timer
 hw_timer_t * timer = NULL;
-volatile bool timerFlag = false;
+volatile bool timerFlag = true;
+
+// pouch time
+long onTime = 60000000;
+long offTime = 15000000;
 
 // Timer Interrupt Service Routine (ISR)
 void IRAM_ATTR onTimer() {
     timerFlag = !timerFlag;  // Set flag when timer fires
     digitalWrite(19, timerFlag ? HIGH : LOW);
+    digitalWrite(33, timerFlag ? HIGH : LOW);
+    timerAlarmWrite(timer, timerFlag ? onTime : offTime, true); // 1 second interval (1M µs)
+    timerAlarmEnable(timer);  // Start the timer
 }
 
 // cover 1 --> 5, 32 * 24 --> 160 * 120
@@ -283,9 +290,12 @@ void setup() {
     // Initialize hardware timer (0) with 1ms prescaler
     timer = timerBegin(0, 80, true); // Timer 0, prescaler 80 (1MHz), count up
     timerAttachInterrupt(timer, &onTimer, true);
-    timerAlarmWrite(timer, 1000000, true); // 1 second interval (1M µs)
+    timerAlarmWrite(timer, timerFlag ? onTime : offTime, true); // 1 second interval (1M µs)
     timerAlarmEnable(timer);  // Start the timer
     pinMode(19, OUTPUT);
+    pinMode(33, OUTPUT);
+    digitalWrite(19, timerFlag ? HIGH : LOW);
+    digitalWrite(33, timerFlag ? HIGH : LOW);
 }
 
 void loop() {
