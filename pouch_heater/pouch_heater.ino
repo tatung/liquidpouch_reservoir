@@ -267,48 +267,48 @@ void cover5() {
 }
 
 void drawpixels(float *p, uint8_t rows, uint8_t cols) {
-    int colorTemp;
+    // int colorTemp;
 
-    for (int y = 0; y < rows; y++) {
-        for (int x = 0; x < cols; x++) {
-            float val = get_point(p, rows, cols, x, y);
+    // for (int y = 0; y < rows; y++) {
+    //     for (int x = 0; x < cols; x++) {
+    //         float val = get_point(p, rows, cols, x, y);
 
-            if (val >= maxtemp) {
-                colorTemp = maxtemp;
-            } else if (val <= mintemp) {
-                colorTemp = mintemp;
-            } else {
-                colorTemp = val;
-            }
+    //         if (val >= maxtemp) {
+    //             colorTemp = maxtemp;
+    //         } else if (val <= mintemp) {
+    //             colorTemp = mintemp;
+    //         } else {
+    //             colorTemp = val;
+    //         }
 
-            uint8_t colorIndex = map(colorTemp, mintemp, maxtemp, 0, 255);
-            colorIndex         = constrain(colorIndex, 0, 255);  // 0 ~ 255
-            // draw the pixels!
-            img.drawPixel(x, y, camColors[colorIndex]);
-        }
-    }
+    //         uint8_t colorIndex = map(colorTemp, mintemp, maxtemp, 0, 255);
+    //         colorIndex         = constrain(colorIndex, 0, 255);  // 0 ~ 255
+    //         // draw the pixels!
+    //         img.drawPixel(x, y, camColors[colorIndex]);
+    //     }
+    // }
 
-    img.drawCircle(COLS_4 / 2, ROWS_4 / 2, 5,
-                   TFT_WHITE);  // update center spot icon
-    img.drawLine(COLS_4 / 2 - 8, ROWS_4 / 2, COLS_4 / 2 + 8, ROWS_4 / 2,
-                 TFT_WHITE);  // vertical line
-    img.drawLine(COLS_4 / 2, ROWS_4 / 2 - 8, COLS_4 / 2, ROWS_4 / 2 + 8,
-                 TFT_WHITE);  // horizontal line
-    img.setCursor(COLS_4 / 2 + 6, ROWS_4 / 2 - 12);
-    img.setTextColor(TFT_WHITE);
-    img.printf("%.2fC", get_point(p, rows, cols, cols / 2, rows / 2));
-    img.pushSprite(0, 0);
+    // img.drawCircle(COLS_4 / 2, ROWS_4 / 2, 5,
+    //                TFT_WHITE);  // update center spot icon
+    // img.drawLine(COLS_4 / 2 - 8, ROWS_4 / 2, COLS_4 / 2 + 8, ROWS_4 / 2,
+    //              TFT_WHITE);  // vertical line
+    // img.drawLine(COLS_4 / 2, ROWS_4 / 2 - 8, COLS_4 / 2, ROWS_4 / 2 + 8,
+    //              TFT_WHITE);  // horizontal line
+    // img.setCursor(COLS_4 / 2 + 6, ROWS_4 / 2 - 12);
+    // img.setTextColor(TFT_WHITE);
+    // img.printf("%.2fC", get_point(p, rows, cols, cols / 2, rows / 2));
+    // img.pushSprite(0, 0);
 
-    msg.fillScreen(TFT_BLACK);
-    msg.setTextColor(TFT_YELLOW);
-    msg.setCursor(11, 3);
-    msg.printf("min tmp (%2.fC)", mintemp);
-    msg.setCursor(13, 15);
-    msg.printf("%.2fC", min_v);
-    msg.setCursor(11, 27);
-    msg.printf("max tmp (%2.fC)", maxtemp);
-    msg.setCursor(13, 39);
-    msg.printf("%.2fC", max_v);
+    // msg.fillScreen(TFT_BLACK);
+    // msg.setTextColor(TFT_YELLOW);
+    // msg.setCursor(11, 3);
+    // msg.printf("min tmp (%2.fC)", mintemp);
+    // msg.setCursor(13, 15);
+    // msg.printf("%.2fC", min_v);
+    // msg.setCursor(11, 27);
+    // msg.printf("max tmp (%2.fC)", maxtemp);
+    // msg.setCursor(13, 39);
+    // msg.printf("%.2fC", max_v);
 
     msg.setCursor(11, 51);
     msg.printf("%d, %d, %ld, %ld", _exp_cnt, _thermal_cycle_cnt, onTime, offTime);
@@ -328,15 +328,15 @@ void tempLog(void *pvParams){
     int rows = params->rows;
     int cols = params->cols;
     while(1){
-        Serial.printf("%d, %d, %d, onTime = %ld, offTime = %ld, ", timerFlag, _thermal_cycle_cnt, onTime, offTime);
-        for (int y = 0; y < rows; y++) {
-            for (int x = 0; x < cols; x++) {
-                float val = get_point(p, rows, cols, x, y);
-                Serial.printf("%.2f ", val);
-            }
-            Serial.printf("|");
-        }
-        Serial.printf("\r\n");
+        Serial.printf("%d, %d, %d, onTime = %ld, offTime = %ld\r\n", timerFlag, _exp_cnt, _thermal_cycle_cnt, onTime, offTime);
+    //   for (int y = 0; y < rows; y++) {
+    //       Serial.printf("%d, %d, onTime = %ld, offTime = %ld, %ld: ", _exp_cnt, _thermal_cycle_cnt, onTime, offTime, millis() - startMeasureTime);
+    //       for (int x = 0; x < cols; x++) {
+    //           float val = get_point(p, rows, cols, x, y);
+    //           Serial.printf("%2f ", val);
+    //       }
+    //       Serial.printf("\r\n");
+    //   }
     }
 }
 
@@ -451,55 +451,55 @@ void loop() {
         maxtemp = maxtemp + 1;
     }
 
-    uint16_t mlx90640Frame[834];
+    // uint16_t mlx90640Frame[834];
 
-    // those fun get tmp array, 32*24, 5fps
-    for (byte x = 0; x < speed_setting; x++) {
-        int status = MLX90640_GetFrameData(MLX90640_address, mlx90640Frame);
-        if (status < 0) {
-            Serial.print("GetFrame Error: ");
-            Serial.println(status);
-        }
+    // // those fun get tmp array, 32*24, 5fps
+    // for (byte x = 0; x < speed_setting; x++) {
+    //     int status = MLX90640_GetFrameData(MLX90640_address, mlx90640Frame);
+    //     if (status < 0) {
+    //         Serial.print("GetFrame Error: ");
+    //         Serial.println(status);
+    //     }
 
-        float vdd = MLX90640_GetVdd(mlx90640Frame, &mlx90640);
-        float Ta  = MLX90640_GetTa(mlx90640Frame, &mlx90640);
-        float tr  = Ta - TA_SHIFT;  // Reflected temperature based on the sensor
-                                    // ambient temperature
-        float emissivity = 0.95;
-        MLX90640_CalculateTo(
-            mlx90640Frame, &mlx90640, emissivity, tr,
-            reversePixels);  // save pixels temp to array (pixels)
-        int mode = MLX90640_GetCurMode(MLX90640_address);
-        MLX90640_BadPixelsCorrection(mlx90640.brokenPixels, reversePixels, mode,
-                                     &mlx90640);
-    }
+    //     float vdd = MLX90640_GetVdd(mlx90640Frame, &mlx90640);
+    //     float Ta  = MLX90640_GetTa(mlx90640Frame, &mlx90640);
+    //     float tr  = Ta - TA_SHIFT;  // Reflected temperature based on the sensor
+    //                                 // ambient temperature
+    //     float emissivity = 0.95;
+    //     MLX90640_CalculateTo(
+    //         mlx90640Frame, &mlx90640, emissivity, tr,
+    //         reversePixels);  // save pixels temp to array (pixels)
+    //     int mode = MLX90640_GetCurMode(MLX90640_address);
+    //     MLX90640_BadPixelsCorrection(mlx90640.brokenPixels, reversePixels, mode,
+    //                                  &mlx90640);
+    // }
 
-    // if want to send tmp array to other device, you can write fun in here:
-    // xxx.send(reversePixels, 32*24);
+    // // if want to send tmp array to other device, you can write fun in here:
+    // // xxx.send(reversePixels, 32*24);
 
-    // Reverse image (order of Integer array)
-    for (int x = 0; x < pixelsArraySize; x++) {
-        if (x % COLS == 0) {
-            for (int j = 0 + x, k = (COLS - 1) + x; j < COLS + x; j++, k--) {
-                pixels[j] = reversePixels[k];
-            }
-        }
-    }
+    // // Reverse image (order of Integer array)
+    // for (int x = 0; x < pixelsArraySize; x++) {
+    //     if (x % COLS == 0) {
+    //         for (int j = 0 + x, k = (COLS - 1) + x; j < COLS + x; j++, k--) {
+    //             pixels[j] = reversePixels[k];
+    //         }
+    //     }
+    // }
 
-    max_v = mintemp;
-    min_v = maxtemp;
+    // max_v = mintemp;
+    // min_v = maxtemp;
 
-    for (int itemp = 0; itemp < sizeof(pixels) / sizeof(pixels[0]); itemp++) {
-        if (pixels[itemp] > max_v) {
-            max_v = pixels[itemp];
-        }
-        if (pixels[itemp] < min_v) {
-            min_v = pixels[itemp];
-        }
-    }
+    // for (int itemp = 0; itemp < sizeof(pixels) / sizeof(pixels[0]); itemp++) {
+    //     if (pixels[itemp] > max_v) {
+    //         max_v = pixels[itemp];
+    //     }
+    //     if (pixels[itemp] < min_v) {
+    //         min_v = pixels[itemp];
+    //     }
+    // }
 
-    // cover pixels to pixels_4
-    cover5();
+    // // cover pixels to pixels_4
+    // cover5();
 
     // show tmp image
     drawpixels(pixels_4, ROWS_4, COLS_4);
@@ -507,5 +507,5 @@ void loop() {
 
     loopTime = millis();
     endTime  = loopTime;
-    fps      = 1000 / (endTime - startTime);
+    // fps      = 1000 / (endTime - startTime);
 }
