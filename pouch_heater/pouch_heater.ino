@@ -96,25 +96,14 @@ long onTime = 0;
 long offTime = 0;
 
 int NO_OF_THERMAL_CYCLES = 10;
-int NO_OF_EXP = 60;
+int NO_OF_EXP = 61;
 int _thermal_cycle_cnt = -1;
 int _exp_cnt = 0;
 
 // 2D array of time intervals for heating and cooling cycles
-// long thermal_intervals[10][2] = {
-//     {1000000, 15000000},
-//     {2000000, 15000000},
-//     {3000000, 15000000},
-//     {4000000, 15000000},
-//     {5000000, 15000000},
-//     {6000000, 15000000},
-//     {7000000, 15000000},
-//     {8000000, 15000000},
-//     {9000000, 15000000},
-//     {10000000, 15000000},
-// };
 
-long thermal_intervals[60][2] = {
+long thermal_intervals[61][2] = {
+    {75000000, 15000000},
     {50000000, 15000000},
     {15000000, 15000000},
     {11000000, 15000000},
@@ -328,7 +317,7 @@ void tempLog(void *pvParams){
     int rows = params->rows;
     int cols = params->cols;
     while(1){
-        Serial.printf("%d, %d, %d, onTime = %ld, offTime = %ld\r\n", timerFlag, _exp_cnt, _thermal_cycle_cnt, onTime, offTime);
+        Serial.printf("%d, %d, %d, %ld, %ld\r\n", _exp_cnt, _thermal_cycle_cnt, timerFlag, onTime/1000000, offTime/1000000);
     //   for (int y = 0; y < rows; y++) {
     //       Serial.printf("%d, %d, onTime = %ld, offTime = %ld, %ld: ", _exp_cnt, _thermal_cycle_cnt, onTime, offTime, millis() - startMeasureTime);
     //       for (int x = 0; x < cols; x++) {
