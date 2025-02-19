@@ -96,7 +96,7 @@ long onTime = 0;
 long offTime = 0;
 
 int NO_OF_THERMAL_CYCLES = 10;
-int NO_OF_EXP = 60;
+int NO_OF_EXP = 1;
 int _thermal_cycle_cnt = -1;
 int _exp_cnt = 0;
 
@@ -328,7 +328,7 @@ void tempLog(void *pvParams){
     int rows = params->rows;
     int cols = params->cols;
     while(1){
-        Serial.printf("%d, %d, %d, onTime = %ld, offTime = %ld, ", timerFlag, _thermal_cycle_cnt, onTime, offTime);
+        Serial.printf("%d, %d, %d, onTime = %ld, offTime = %ld, ", timerFlag, _exp_cnt, _thermal_cycle_cnt, onTime/1000000, offTime/1000000);
         for (int y = 0; y < rows; y++) {
             for (int x = 0; x < cols; x++) {
                 float val = get_point(p, rows, cols, x, y);
