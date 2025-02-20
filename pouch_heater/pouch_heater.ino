@@ -317,7 +317,7 @@ void tempLog(void *pvParams){
     int rows = params->rows;
     int cols = params->cols;
     while(1){
-        Serial.printf("%d, %d, %d, %ld, %ld\r\n", _exp_cnt, _thermal_cycle_cnt, timerFlag, onTime/1000000, offTime/1000000);
+        Serial.printf("%d, %d, %d, %ld, %ld, %ld\r\n", _exp_cnt, _thermal_cycle_cnt, timerFlag, onTime/1000000, offTime/1000000, millis() - startMeasureTime);
     //   for (int y = 0; y < rows; y++) {
     //       Serial.printf("%d, %d, onTime = %ld, offTime = %ld, %ld: ", _exp_cnt, _thermal_cycle_cnt, onTime, offTime, millis() - startMeasureTime);
     //       for (int x = 0; x < cols; x++) {
