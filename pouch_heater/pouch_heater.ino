@@ -25,7 +25,7 @@ LGFX_Sprite msg = LGFX_Sprite(&M5.Lcd);
 #define INTERPOLATED_COLS 32
 #define INTERPOLATED_ROWS 32
 
-#define _pauseTime 25000000 // 25s
+#define _pauseTime 1500000 // 1.5s
 
 float pixels[COLS * ROWS];
 float reversePixels[COLS * ROWS];
@@ -122,7 +122,7 @@ long thermal_intervals[20][2] = {
     {0, _pauseTime},
     {4000000, 15000000},
     {0, _pauseTime},
-    {8000000, 15000000}
+    {8000000, 15000000},
     {0, _pauseTime}
 };
 
@@ -402,7 +402,7 @@ void tempLog(void *pvParams){
     int rows = params->rows;
     int cols = params->cols;
     while(1){
-        Serial.printf("%d, %d, %d, %ld, %ld, %ld\r\n", _exp_cnt, _thermal_cycle_cnt, timerFlag, onTime/1000000, offTime/1000000, millis() - startMeasureTime);
+        Serial.printf("%d, %d, %d, %ld, %.2f, %ld\r\n", _exp_cnt, _thermal_cycle_cnt, timerFlag, onTime/1000000, (float)offTime/1000000, millis() - startMeasureTime);
     //   for (int y = 0; y < rows; y++) {
     //       Serial.printf("%d, %d, onTime = %ld, offTime = %ld, %ld: ", _exp_cnt, _thermal_cycle_cnt, onTime, offTime, millis() - startMeasureTime);
     //       for (int x = 0; x < cols; x++) {
