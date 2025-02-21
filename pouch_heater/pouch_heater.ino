@@ -25,6 +25,8 @@ LGFX_Sprite msg = LGFX_Sprite(&M5.Lcd);
 #define INTERPOLATED_COLS 32
 #define INTERPOLATED_ROWS 32
 
+#define _pauseTime 25000000 // 25s
+
 float pixels[COLS * ROWS];
 float reversePixels[COLS * ROWS];
 float pixels_4[COLS_4 * ROWS_4];
@@ -101,37 +103,62 @@ int _thermal_cycle_cnt = -1;
 int _exp_cnt = 0;
 
 // 2D array of time intervals for heating and cooling cycles: 10mm x 10mm pouch
-// long thermal_intervals[10][2] = {
-//     {2000000, 15000000},
-//     {5000000, 15000000},
-//     {3000000, 15000000},
-//     {7000000, 15000000},
-//     {10000000, 15000000},
-//     {6000000, 15000000},
-//     {1000000, 15000000},
-//     {9000000, 15000000},
-//     {4000000, 15000000},
-//     {8000000, 15000000}
-// };
+long thermal_intervals[20][2] = {
+    {2000000, 15000000},
+    {0, _pauseTime},
+    {5000000, 15000000},
+    {0, _pauseTime},
+    {3000000, 15000000},
+    {0, _pauseTime},
+    {7000000, 15000000},
+    {0, _pauseTime},
+    {10000000, 15000000},
+    {0, _pauseTime},
+    {6000000, 15000000},
+    {0, _pauseTime},
+    {1000000, 15000000},
+    {0, _pauseTime},
+    {9000000, 15000000},
+    {0, _pauseTime},
+    {4000000, 15000000},
+    {0, _pauseTime},
+    {8000000, 15000000}
+    {0, _pauseTime}
+};
 
 // 2D array of time intervals for heating and cooling cycles: 15mm x 15mm pouch
-long thermal_intervals[15][2] = {
-    {12000000, 15000000},
-    {4000000, 15000000},
-    {1000000, 15000000},
-    {7000000, 15000000},
-    {3000000, 15000000},
-    {10000000, 15000000},
-    {8000000, 15000000},
-    {13000000, 15000000},
-    {5000000, 15000000},
-    {2000000, 15000000},
-    {14000000, 15000000},
-    {15000000, 15000000},
-    {9000000, 15000000},
-    {11000000, 15000000},
-    {6000000, 15000000}
-};
+// long thermal_intervals[30][2] = {
+//     {12000000, 15000000},
+//     {0, _pauseTime},
+//     {4000000, 15000000},
+//     {0, _pauseTime},
+//     {1000000, 15000000},
+//     {0, _pauseTime},
+//     {7000000, 15000000},
+//     {0, _pauseTime},
+//     {3000000, 15000000},
+//     {0, _pauseTime},
+//     {10000000, 15000000},
+//     {0, _pauseTime},
+//     {8000000, 15000000},
+//     {0, _pauseTime},
+//     {13000000, 15000000},
+//     {0, _pauseTime},
+//     {5000000, 15000000},
+//     {0, _pauseTime},
+//     {2000000, 15000000},
+//     {0, _pauseTime},
+//     {14000000, 15000000},
+//     {0, _pauseTime},
+//     {15000000, 15000000},
+//     {0, _pauseTime},
+//     {9000000, 15000000},
+//     {0, _pauseTime},
+//     {11000000, 15000000},
+//     {0, _pauseTime},
+//     {6000000, 15000000}
+//     {0, _pauseTime}
+// };
 
 // 2D array of time intervals for heating and cooling cycles:
 // 20mm x 20mm and 
