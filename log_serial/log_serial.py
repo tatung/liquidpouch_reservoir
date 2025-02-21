@@ -9,7 +9,8 @@ ser = serial.Serial('COM4', 115200, timeout=1)
 idx = 0
 isCreateNewFile = True
 
-log_name = "serial_log_" + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")[:-3].replace(":", "_")
+
+log_name = "serial_log_" + "20mm_20mm_" + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")[:-3].replace(":", "_")
 file = open(log_name + ".txt", "w")
 
 while True:
@@ -21,8 +22,7 @@ while True:
                 file.close()
                 idx += 2
                 # open a new file
-                log_name = log_name + "_" + str(idx)
-                file = open(log_name + ".txt", "w")
+                file = open(log_name + "_" + str(idx) + ".txt", "w")
                 isCreateNewFile = False
         else:
             isCreateNewFile = True
