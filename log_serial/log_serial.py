@@ -9,9 +9,13 @@ ser = serial.Serial('COM4', 115200, timeout=1)
 idx = 0
 isCreateNewFile = True
 
+import os
+
+# Define absolute path (Modify as needed)
+file_path = r"G:\\My Drive\\Mocap\\pouch\data_20250221\\tmp\\"
 
 log_name = "serial_log_" + "20mm_20mm_" + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")[:-3].replace(":", "_")
-file = open(log_name + ".txt", "w")
+file = open(file_path + log_name + ".txt", "w")
 
 while True:
     line = ser.readline().decode('utf-8', errors='replace').strip()
@@ -22,7 +26,7 @@ while True:
                 file.close()
                 idx += 2
                 # open a new file
-                file = open(log_name + "_" + str(idx) + ".txt", "w")
+                file = open(file_path + log_name + "_" + str(idx) + ".txt", "w")
                 isCreateNewFile = False
         else:
             isCreateNewFile = True
