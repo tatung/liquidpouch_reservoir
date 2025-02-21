@@ -21,7 +21,7 @@ while True:
                 file.close()
                 idx += 2
                 # open a new file
-                log_name = log_name + "_" + idx
+                log_name = log_name + "_" + str(idx)
                 file = open(log_name + ".txt", "w")
                 isCreateNewFile = False
         else:
