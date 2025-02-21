@@ -95,8 +95,8 @@ volatile bool timerFlag = false;
 long onTime = 0;
 long offTime = 0;
 
-int NO_OF_THERMAL_CYCLES = 10;
-int NO_OF_EXP = 61;
+int NO_OF_THERMAL_CYCLES = 100;
+int NO_OF_EXP = 1;
 int _thermal_cycle_cnt = -1;
 int _exp_cnt = 0;
 
