@@ -12,7 +12,7 @@ Load the [.npy file][2] (in a script created in your PhysRes/examples folder) co
     sample = 1 #downsample if need e.g. sample = 10
     Y_ = np.load(data_out_interp)[:,::sample,:-1] #load all coordinates, except for the last column, representing the on/off signal, not needed for modeling the states
 
-Some files should be discarded, for example when containing erroneous labeling (as stated in the [OptiTrack documentation][3], "multiple non-unique Rigid Bodies may lead to mislabeling errors" in the auto-labeling feature), resulting in a final number of 399 experiments:
+Some experiments should be discarded, for example when containing erroneous labeling (as stated in the [OptiTrack documentation][3], "multiple non-unique Rigid Bodies may lead to mislabeling errors" in the auto-labeling feature), resulting in a final number of 399 experiments:
 
 
     # Discard error-proned files
