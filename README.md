@@ -58,7 +58,7 @@ We now reshape the target and estimation to retrieve the initial array shape.
     Ypred_ = Ypred_.reshape(L_test,-1,M,order=order)
 
 Y_test_ and Ypred_ represent the ground truth state and estimated state of the system, respectively.
-Finally, we compute the model's estimation errors (normalized root mean squared errors or NRMSE) wrt to the target along each column, and their mean, standard deviation, and median.
+Finally, we compute the model's estimation errors (normalized root mean squared errors or NRMSE) wrt to the target along each column (x,y,z coordinates of the states), and their mean, standard deviation, and median.
 
     errors = np.asarray( [
         [
