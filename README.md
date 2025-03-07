@@ -33,7 +33,7 @@ The collected data are then randomized and divided into a training set (70% of t
     order = 'F' #Reshape for the network matrices shape requirement
     Y = Y_.reshape(L,-1,order=order)
 
-    N = 1000  #Reservoir size (number of nodes, , type: int)
+    N = 1000  #Reservoir size (number of nodes, type: int)
     alpha = 1  #Alpha (scaling hyperparam, type: float)
     lamda = 1  #latency (type: int). Note: "lambda" is already taken in python builtins (the anonymous lambda function)
     tau = 1  #Tau (state delay, generally set to 1, type: int)
